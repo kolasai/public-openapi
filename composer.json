@@ -1,14 +1,15 @@
 {
-    "name": "kolasai/public-openapi",
-    "description": "This is a Kolas.Ai application's public API based on the OpenAPI 3.1 specification.",
-    "keywords": ["library", "kolasai", "artificial intelligence", "ai"],
-    "type": "library",
-    "license": "MIT",
-    "homepage": "https://kolas.ai",
-		"authors": [
-	    {
-	      "name": "kolas.ai",
-	      "email": "info@kolas.ai"
-	    }
-		]
+	"name": "kolasai/public-openapi",
+	"description": "This is a Kolas.Ai application's public API based on the OpenAPI 3.1 specification.",
+	"keywords": ["library", "kolasai", "artificial intelligence", "ai"],
+	"type": "library",
+	"license": "Apache-2.0",
+	"homepage": "https://kolas.ai",
+	"minimum-stability": "stable",
+	"authors": [
+		{
+			"name": "kolas.ai",
+			"email": "info@kolas.ai"
+		}
+	]
 }
