@@ -1,0 +1,161 @@
+openapi: 3.1.0
+info:
+  title: Kolas.Ai public API - OpenAPI 3.1
+  description: |-
+    This is a Kolas.Ai application's public API based on the OpenAPI 3.1 specification.  You can find out more about
+    Swagger at [https://swagger.io](https://swagger.io).
+
+    Some useful links:
+    - [The Kolas.Ai repository](https://github.com/kolasai)
+
+  termsOfService: https://kolas.ai/terms/
+  contact:
+    email: info@kolas.ai
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+externalDocs:
+  description: Find out more about Swagger
+  url: http://swagger.io
+servers:
+  - url: https://app.kolas.ai/api/v1
+tags:
+  - name: predictions
+    description: Operations about predictions
+    externalDocs:
+      description: Find out more
+      url: https://kolas.ai/documentation
+  - name: user
+    description: Operations about user
+paths:
+  /predict/{projectId}:
+    post:
+      tags:
+        - predictions
+      summary: Predict a message category
+      description: Returns a predicted category of message by a configured dataset in a project
+      operationId: predict
+      parameters:
+        - name: projectId
+          in: path
+          description: ID of project
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        $ref: '#/components/requestBodies/PredictionRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/PredictionResponse'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '404':
+          $ref: '#/components/responses/Error404'
+        '422':
+          $ref: '#/components/responses/Error422'
+        '5XX':
+          $ref: '#/components/responses/Error5XX'
+      security:
+        - api_key: []
+components:
+  schemas:
+    Message:
+      required:
+        - message
+      type: object
+      properties:
+        message:
+          type: string
+          format:
+          examples:
+            - What did you do yesturday?
+    ApiResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+        type:
+          type: string
+        message:
+          type: string
+      xml:
+        name: '##default'
+    Prediction:
+      type: object
+      properties:
+        categories:
+          descrition:
+            List of supported project's categories
+          type: array
+          examples:
+            - [ Neutral, Insult, Spam ]
+        category:
+          type: string
+          examples:
+            - Neutral
+        message:
+          type: string
+          examples:
+            - What did you do yestoday?
+    Error:
+      type: object
+      properties:
+        errors:
+          type: array
+        message:
+          type: string
+      required:
+        - message
+  responses:
+    PredictionResponse:
+      description: successful operation
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Prediction'
+    Error400:
+      description: Invalid ID supplied
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Error404:
+      description: Project not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Error422:
+      description: Validation exception
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Error5XX:
+      description: Unexpected error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  requestBodies:
+    PredictionRequest:
+      required: true
+      description: Ask for a forecast for the message.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Message'
+  securitySchemes:
+    kolasai_auth:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: https://app.kolas.ai/oauth/authorize
+          scopes:
+    api_key:
+      type: apiKey
+      name: api_key
+      in: header
