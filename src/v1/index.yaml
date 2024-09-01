@@ -17,7 +17,7 @@ info:
   version: 1.0.0
 externalDocs:
   description: Find out more about Swagger
-  url: http://swagger.io
+  url: https://swagger.io
 servers:
   - url: https://app.kolas.ai/api/v1
 tags:
@@ -44,6 +44,7 @@ paths:
           schema:
             type: integer
             format: int64
+            minimum: 1
       requestBody:
         $ref: '#/components/requestBodies/PredictionRequest'
       responses:
@@ -58,7 +59,7 @@ paths:
         '5XX':
           $ref: '#/components/responses/Error5XX'
       security:
-        - api_key: []
+        - api_key: [ ]
 components:
   schemas:
     Message:
@@ -68,38 +69,30 @@ components:
       properties:
         message:
           type: string
-          format:
+          maxLength: 5120
           examples:
-            - What did you do yesturday?
-    ApiResponse:
-      type: object
-      properties:
-        code:
-          type: integer
-          format: int32
-        type:
-          type: string
-        message:
-          type: string
-      xml:
-        name: '##default'
+            - What did you do yesterday?
     Prediction:
       type: object
       properties:
         categories:
-          descrition:
+          description:
             List of supported project's categories
           type: array
           examples:
             - [ Neutral, Insult, Spam ]
         category:
+          description:
+            Predicted category
           type: string
           examples:
             - Neutral
         message:
           type: string
+          description:
+            Sent message for prediction
           examples:
-            - What did you do yestoday?
+            - What did you do yesterday?
     Error:
       type: object
       properties:
@@ -115,7 +108,9 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Prediction'
+            type: array
+            items:
+              $ref: '#/components/schemas/Prediction'
     Error400:
       description: Invalid ID supplied
       content:
@@ -147,7 +142,9 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Message'
+            type: array
+            items:
+              $ref: '#/components/schemas/Message'
   securitySchemes:
     kolasai_auth:
       type: oauth2
@@ -155,6 +152,7 @@ components:
         implicit:
           authorizationUrl: https://app.kolas.ai/oauth/authorize
           scopes:
+            read: Grants read access
     api_key:
       type: apiKey
       name: api_key
