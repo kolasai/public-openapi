@@ -29,22 +29,13 @@ tags:
   - name: user
     description: Operations about user
 paths:
-  /predict/{projectId}:
+  /predict:
     post:
       tags:
         - predictions
       summary: Predict a message category
       description: Returns a predicted category of message by a configured dataset in a project
       operationId: predict
-      parameters:
-        - name: projectId
-          in: path
-          description: ID of project
-          required: true
-          schema:
-            type: integer
-            format: int64
-            minimum: 1
       requestBody:
         $ref: '#/components/requestBodies/PredictionRequest'
       responses:
@@ -108,9 +99,12 @@ components:
       content:
         application/json:
           schema:
-            type: array
-            items:
-              $ref: '#/components/schemas/Prediction'
+            type: object
+            properties:
+              predictions:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Prediction'
     Error400:
       description: Invalid ID supplied
       content:
@@ -142,9 +136,18 @@ components:
       content:
         application/json:
           schema:
-            type: array
-            items:
-              $ref: '#/components/schemas/Message'
+            type: object
+            properties:
+              projectId:
+                description: ID of project
+                type: integer
+                format: int64
+                minimum: 1
+                examples: [3457]
+              messages:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Message'
   securitySchemes:
     kolasai_auth:
       type: oauth2
