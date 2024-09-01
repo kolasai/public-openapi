@@ -1,0 +1,13 @@
+{
+    "name": "kolasai/public-openapi",
+    "description": "This is a Kolas.Ai application's public API based on the OpenAPI 3.1 specification.",
+    "keywords": ["library", "kolasai", "artificial intelligence", "ai"],
+    "type": "library",
+    "homepage": "https://kolas.ai",
+		"authors": [
+	    {
+	      "name": "kolas.ai",
+	      "email": "info@kolas.ai"
+	    }
+		]
+}
