@@ -6,7 +6,7 @@ info:
     Swagger at [https://swagger.io](https://swagger.io).
 
     Some useful links:
-    - [The Kolas.Ai repository](https://github.com/kolasai)
+    - [The Kolas.Ai repositories](https://github.com/kolasai?tab=repositories)
 
   termsOfService: https://kolas.ai/terms/
   contact:
@@ -26,8 +26,6 @@ tags:
     externalDocs:
       description: Find out more
       url: https://kolas.ai/documentation
-  - name: user
-    description: Operations about user
 paths:
   /predict:
     post:
@@ -43,8 +41,6 @@ paths:
           $ref: '#/components/responses/PredictionResponse'
         '400':
           $ref: '#/components/responses/Error400'
-        '404':
-          $ref: '#/components/responses/Error404'
         '422':
           $ref: '#/components/responses/Error422'
         '5XX':
@@ -68,16 +64,22 @@ components:
       properties:
         categories:
           description:
-            List of supported project's categories
+            List of supported project categories for prediction
           type: array
           examples:
             - [ Neutral, Insult, Spam ]
-        category:
+        prediction:
           description:
             Predicted category
           type: string
           examples:
             - Neutral
+        probability:
+          description:
+            The accurate of prediction
+          type: string
+          examples:
+            - 0.99808084964752
         message:
           type: string
           description:
@@ -91,6 +93,18 @@ components:
           type: array
         message:
           type: string
+          examples:
+            - Project 354 is not found.
+        errorCode:
+          type: string
+          enum:
+            - PROJECT_NOT_FOUND
+            - PROJECT_DATASET_NOT_CONFIGURED
+            - PROJECT_NOT_ACTIVE
+            - ACCOUNT_BALANCE_EMPTY
+            - null
+          examples:
+            - CODE_PROJECT_NOT_FOUND
       required:
         - message
   responses:
@@ -111,12 +125,8 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
-    Error404:
-      description: Project not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
+            examples:
+              - {"message": "The projectId field must be at least 1."}
     Error422:
       description: Validation exception
       content:
@@ -129,6 +139,8 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
+            examples:
+              - {"message": "Internal server error. Contact technical support."}
   requestBodies:
     PredictionRequest:
       required: true
