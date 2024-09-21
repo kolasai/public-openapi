@@ -149,6 +149,9 @@ components:
         application/json:
           schema:
             type: object
+            required:
+              - messages
+              - projectId
             properties:
               projectId:
                 description: ID of project
