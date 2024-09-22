@@ -14,7 +14,7 @@ info:
   license:
     name: Apache 2.0
     url: https://www.apache.org/licenses/LICENSE-2.0.html
-  version: 1.0.3
+  version: 1.0.4
 externalDocs:
   description: Find out more about Swagger
   url: https://swagger.io
@@ -26,6 +26,8 @@ tags:
     externalDocs:
       description: Find out more
       url: https://kolas.ai/documentation
+security:
+  - oAuth2: []
 paths:
   /predict:
     post:
@@ -39,14 +41,12 @@ paths:
       responses:
         '200':
           $ref: '#/components/responses/PredictionResponse'
-        '400':
-          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
         '422':
           $ref: '#/components/responses/Error422'
         '5XX':
           $ref: '#/components/responses/Error5XX'
-      security:
-        - api_key: [ ]
 components:
   schemas:
     Message:
@@ -119,14 +119,14 @@ components:
                 type: array
                 items:
                   $ref: '#/components/schemas/Prediction'
-    Error400:
-      description: Invalid ID supplied
+    UnauthorizedError:
+      description: Access token is missing or invalid
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
             examples:
-              - {"message": "The projectId field must be at least 1."}
+              - {"message": "Unauthenticated."}
     Error422:
       description: Validation exception
       content:
@@ -164,14 +164,9 @@ components:
                 items:
                   $ref: '#/components/schemas/Message'
   securitySchemes:
-    kolasai_auth:
+    oAuth2:
       type: oauth2
       flows:
-        implicit:
-          authorizationUrl: https://app.kolas.ai/oauth/authorize
-          scopes:
-            read: Grants read access
-    api_key:
-      type: apiKey
-      name: api_key
-      in: header
+        clientCredentials:
+          tokenUrl: https://app.kolas.ai/oauth/token
+          scopes: {}
