@@ -14,7 +14,7 @@ info:
   license:
     name: Apache 2.0
     url: https://www.apache.org/licenses/LICENSE-2.0.html
-  version: 1.0.5
+  version: 1.1.0
 externalDocs:
   description: Find out more about Swagger
   url: https://swagger.io
@@ -27,7 +27,7 @@ tags:
       description: Find out more
       url: https://kolas.ai/documentation
 security:
-  - oAuth2: []
+  - oAuth2: [ ]
 paths:
   /predictions/predict:
     post:
@@ -47,13 +47,34 @@ paths:
           $ref: '#/components/responses/Error422'
         '5XX':
           $ref: '#/components/responses/Error5XX'
+  /predictions/asyncPredict:
+    post:
+      tags:
+        - asyncPredictions
+      summary: Predict a message category
+      description: Returns a predicted category of message by a configured dataset in a project
+      operationId: asyncPredict
+      requestBody:
+        $ref: '#/components/requestBodies/PredictionRequest'
+      responses:
+        '201':
+          $ref: '#/components/responses/AsyncPredictionResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '422':
+          $ref: '#/components/responses/Error422'
+        '5XX':
+          $ref: '#/components/responses/Error5XX'
 components:
   schemas:
     Message:
       required:
         - message
+        - messageId
       type: object
       properties:
+        messageId:
+          $ref: '#/components/schemas/MessageId'
         message:
           type: string
           maxLength: 5120
@@ -62,6 +83,8 @@ components:
     Prediction:
       type: object
       properties:
+        messageId:
+          $ref: '#/components/schemas/MessageId'
         categories:
           description:
             List of supported project categories for prediction
@@ -86,6 +109,42 @@ components:
             Sent message for prediction
           examples:
             - What did you do yesterday?
+    MessageId:
+      type: string
+      maxLength: 255
+      description: Unique message identity as UUID
+      examples:
+        - 75a292aa-5f91-5a7f-e970-4cfc8bd8da30
+    ClassifiedMessage:
+      type: object
+      required:
+        - messageId
+      properties:
+        messageId:
+          $ref: '#/components/schemas/MessageId'
+        message:
+          type: string
+        predictions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Prediction1'
+    Prediction1:
+      type: object
+      properties:
+        categories:
+          type: array
+          items:
+            type: string
+            exaples:
+              - Insult
+              - Neutral
+        prediction:
+          type: string
+        probability:
+          type: string
+          description: D
+          examples:
+            - '0.92'
     Error:
       type: object
       properties:
@@ -119,6 +178,12 @@ components:
                 type: array
                 items:
                   $ref: '#/components/schemas/Prediction'
+    AsyncPredictionResponse:
+      description: successful operation
+      content:
+        application/json:
+          schema:
+            type: object
     UnauthorizedError:
       description: Access token is missing or invalid
       content:
@@ -126,7 +191,7 @@ components:
           schema:
             $ref: '#/components/schemas/Error'
             examples:
-              - {"message": "Unauthenticated."}
+              - { "message": "Unauthenticated." }
     Error422:
       description: Validation exception
       content:
@@ -140,7 +205,7 @@ components:
           schema:
             $ref: '#/components/schemas/Error'
             examples:
-              - {"message": "Internal server error. Contact technical support."}
+              - { "message": "Internal server error. Contact technical support." }
   requestBodies:
     PredictionRequest:
       required: true
@@ -158,7 +223,7 @@ components:
                 type: integer
                 format: int64
                 minimum: 1
-                examples: [3457]
+                examples: [ 3457 ]
               messages:
                 type: array
                 items:
@@ -169,4 +234,35 @@ components:
       flows:
         clientCredentials:
           tokenUrl: /oauth/token
-          scopes: {}
+          scopes: { }
+webhooks:
+  messagesClassified:
+    post:
+      description: Sends a classified message.
+      parameters:
+        - in: header
+          name: x-signature
+          description: Used to verify the authenticity and integrity of a request using a shared secret key. It is generated using sha256 on the payload and secret.
+          schema:
+            type: string
+            example:
+              - 089a9bed663581f81fc095737325d4085ae12979f135abf18caf70f88d9ad0dd
+          required: true
+        - in: header
+          name: idempotency-key
+          description: This is a unique identifier that ensures that the same operation is not performed more than once, even if the request is repeated due to network failures or timeouts.
+          schema:
+            type: string
+            format: uuid
+            example:
+              - 75a292aa-5f91-5a7f-e970-4cfc8bd8da30
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClassifiedMessage'
+      responses:
+        '200':
+          description: "Return a 200 status to indicate that the data was received successfully"
