@@ -4,7 +4,7 @@ Welcome to the **Kolas.Ai Public API** documentation! This repository hosts the 
 
 ## Overview
 
-The Kolas.Ai API is designed to classify message categories based on a trained dataset within a configured project. Use this API to accurately categorize messages into types like "Neutral," "Insult," or "Spam."
+The Kolas.Ai API is designed to classify message categories based on a trained dataset within a configured project. Use this API to accurately categorize messages into types like "Neutral", "Insult", "Spam" , etc. We support different languages, including English, Russian, Ukrainian, and we can add any languages by request (message to info@kolas.ai). The API is built on the OpenAPI 3.1 standard, ensuring a consistent and easy-to-use interface.
 
 ### Key Features
 - **Predict Message Categories**: Use the `/predictions/predict` endpoint to classify messages based on your project-specific dataset.
@@ -15,9 +15,11 @@ The Kolas.Ai API is designed to classify message categories based on a trained d
 
 The Kolas.Ai API follows the OpenAPI 3.1 standard, which enables easy exploration and integration with various tools. To get started:
 
-1. **Authentication**: Obtain an access token using OAuth2 client credentials.
-2. **Make Predictions**: Send a POST request to `/predictions/predict` with your `projectId` and messages.
-3. **Receive Predictions**: Retrieve predicted categories and their probabilities in the API response.
+1. Create a new account on the [Kolas.Ai platform](https://app.kolas.ai/register).
+2. Create a new project [Clean Talk](https://app.kolas.ai/projects/create) and configure your datasets.
+3. **Authentication**: Obtain an access token using OAuth2 client credentials.
+4. **Make Predictions**: Send a POST request to `/predictions/predict` with your `projectId` and messages.
+5. **Receive Predictions**: Retrieve predicted categories and their probabilities in the API response.
 
 ## Authentication
 
